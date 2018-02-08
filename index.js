@@ -9,7 +9,23 @@ var app = express();
 var path = require('path');
 var http = require('http');
 var server = http.createServer(app);
-var io = require('./lib')(server);
+// si serverClient a true alors va le chercher dans /node_modules/socket.io-client/dist/
+var io = require('./lib')(server, {
+  path: '/sockets', // path: '/admin',
+  serveClient: false
+});
+// const adminNamespace = io.of('/admin');
+// const chatNamespace = io.of('/chat');
+// origin du domaine
+io.origins((origin, callback) => {
+  console.log(origin);
+  if (origin !== 'http://localhost:3000/') {
+    return callback(new Error('origin not allowed'), false);
+  }
+  callback(null, true);
+});
+//
+// les ports et host
 var port = process.env.PORT || 3000;
 // user sockets holder
 var userSockets = {};
@@ -35,7 +51,7 @@ const validateSession = (socket, next) => {
   });
 };
 // sockets handler
-const ioSocket = (socket) => {
+const ioChatSocket = (socket) => {
   var addedUser = false;
   console.log(`new connection: ${socket.request.session.userId}`);
   socket.userId = socket.request.session.userId;
@@ -77,7 +93,6 @@ const ioSocket = (socket) => {
       username: socket.username
     });
   });
-
   // when the user disconnects.. perform this
   socket.on('disconnect', () => {
     _.unset(userSockets, socket.userId);
@@ -90,6 +105,12 @@ const ioSocket = (socket) => {
         numUsers: numUsers
       });
     }
+  });
+  // packet filtering
+  socket.use((packet, next) => {
+    console.log(`${socket.userId} : ${packet}`);
+    next();
+    // next(new Error('Not a doge error'));
   });
 };
 // Routing
@@ -138,6 +159,19 @@ var numUsers = 0;
 // use validation
 io.use(validateSession);
 // connections
+/*
 io.on('connection', (socket) => {
+  console.log('connect to /chat');
   ioSocket(socket);
+});
+*/
+io.of('/chat').on('connect', (socket) => {
+  console.log('connect to /chat');
+  ioChatSocket(socket);
+});
+io.of('/admin').on('connect', (socket) => {
+  console.log('connect to /admin');
+});
+io.on('connect', (socket) => {
+  console.log('connect to /');
 });

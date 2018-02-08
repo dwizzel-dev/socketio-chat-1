@@ -23,7 +23,16 @@ $(function() {
   var lastTypingTime;
   var $currentInput = $usernameInput.focus();
 
-  var socket = io();
+  //var socket = io(`http://${location.host}`, {
+  var socket = io('/chat', {
+    path: '/sockets',
+    reconnect: true,
+    reconnectionAttempts: 3,
+    reconnectionDelay: 2000,
+    query: '&dwizzel=1&env=dev'
+  });
+  //var socket = io(`ws://${location.host}`);
+  
 
   function addParticipantsMessage (data) {
     var message = '';
