@@ -1,6 +1,8 @@
 'use strict';
 
 // Setup basic express server
+var dbg = require('debug')('socket-chat-1::index');
+
 var express = require('express');
 const _ = require('lodash');
 const session = require('express-session');
@@ -36,16 +38,26 @@ const sessionParser = session({
   secret: '$eCuRiTy',
   resave: false
 });
+// debugger console or debug
+const Debug = {
+  log (obj, toConsole = true) {
+    if (toConsole) {
+      console.log(obj);
+    } else {
+      dbg(obj);
+    }
+  }
+};
 // function session validation
 const validateSession = (socket, next) => {
   sessionParser(socket.request, {}, () => {
-    console.log('Session is parsed!');
+    Debug.log('Session is parsed!');
     if (typeof socket.request.session.userId !== 'undefined') {
-      console.log(`user is validated: ${socket.request.session.userId}`);
+      Debug.log(`user is validated: ${socket.request.session.userId}`);
       next();
     } else {
       // reject here if user is unknown.
-      console.log('reject connection');
+      Debug.log('reject connection');
       socket.disconnect();
     }
   });
@@ -53,10 +65,10 @@ const validateSession = (socket, next) => {
 // sockets handler
 const ioChatSocket = (socket) => {
   var addedUser = false;
-  console.log(`new connection: ${socket.request.session.userId}`);
+  Debug.log(`new connection: ${socket.request.session.userId}`);
   socket.userId = socket.request.session.userId;
   userSockets[socket.userId] = socket;
-  console.log('A-NUM: ' + _.size(userSockets));
+  Debug.log('A-NUM: ' + _.size(userSockets));
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
     // we tell the client to execute 'new message'
@@ -96,7 +108,7 @@ const ioChatSocket = (socket) => {
   // when the user disconnects.. perform this
   socket.on('disconnect', () => {
     _.unset(userSockets, socket.userId);
-    console.log('D-NUM: ' + _.size(userSockets));
+    Debug.log('D-NUM: ' + _.size(userSockets));
     if (addedUser) {
       --numUsers;
       // echo globally that this client has left
@@ -108,7 +120,7 @@ const ioChatSocket = (socket) => {
   });
   // packet filtering
   socket.use((packet, next) => {
-    console.log(`${socket.userId} : ${packet}`);
+    Debug.log(`${socket.userId} : ${packet}`);
     next();
     // next(new Error('Not a doge error'));
   });
@@ -120,21 +132,21 @@ app.use(sessionParser);
 // http login session
 app.get('/login', (request, response) => {
   const id = uuid.v4();
-  console.log(`Updating session for user ${id}`);
+  Debug.log(`Updating session for user ${id}`);
   request.session.userId = id;
   try {
     response.send({ result: 'OK', message: 'Session updated' });
     response.end();
   } catch (e) {
-    console.log(e);
+    Debug.log(e);
   }
 });
 // http logout session
 app.get('/logout', (request, response) => {
-  console.log('Destroying session');
+  Debug.log('Destroying session');
   try {
     let userId = request.session.userId;
-    console.log(`destroy userId: ${userId}`);
+    Debug.log(`destroy userId: ${userId}`);
     request.session.destroy();
     // _.find(userSockets, {'userId': userId}).disconnect();
     if (typeof userId !== 'undefined') {
@@ -147,12 +159,12 @@ app.get('/logout', (request, response) => {
     }
     response.end();
   } catch (err) {
-    console.log(err);
+    Debug.log(err);
   }
 });
 // http server listening
 server.listen(port, () => {
-  console.log('Server listening at port %d', port);
+  Debug.log('Server listening at port %d', port);
 });
 // Chatroom
 var numUsers = 0;
@@ -166,12 +178,12 @@ io.on('connection', (socket) => {
 });
 */
 io.of('/chat').on('connect', (socket) => {
-  console.log('connect to /chat');
+  Debug.log('connect to /chat');
   ioChatSocket(socket);
 });
 io.of('/admin').on('connect', (socket) => {
-  console.log('connect to /admin');
+  Debug.log('connect to /admin');
 });
 io.on('connect', (socket) => {
-  console.log('connect to /');
+  Debug.log('connect to /');
 });
