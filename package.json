@@ -1,9 +1,9 @@
 {
-  "name": "socket.io-chat",
+  "name": "socketio-chat-1",
   "version": "0.0.0",
-  "description": "A simple chat client using socket.io",
+  "description": "socket.io with sessions",
   "main": "index.js",
-  "author": "Grant Timmerman",
+  "author": "",
   "private": true,
   "license": "BSD",
   "dependencies": {
