@@ -15,6 +15,7 @@
   },
   "scripts": {
     "start": "node index.js",
+    "debug": "node --inspect index.js",
     "lint": "eslint ."
   },
   "devDependencies": {
