@@ -11,6 +11,11 @@ var app = express();
 var path = require('path');
 var http = require('http');
 var server = http.createServer(app);
+// array des domains qui peuvent acceder
+const arrDomainsAccepted = [
+  'http://localhost:3000/',
+  'http://192.168.33.10:3000/'
+];
 // si serverClient a true alors va le chercher dans /node_modules/socket.io-client/dist/
 var io = require('./lib')(server, {
   path: '/sockets', // path: '/admin',
@@ -21,7 +26,7 @@ var io = require('./lib')(server, {
 // origin du domaine
 io.origins((origin, callback) => {
   console.log(origin);
-  if (origin !== 'http://localhost:3000/') {
+  if (_.indexOf(arrDomainsAccepted, origin) == -1) {
     return callback(new Error('origin not allowed'), false);
   }
   callback(null, true);
@@ -39,15 +44,18 @@ const sessionParser = session({
   resave: false
 });
 // debugger console or debug
-const Debug = {
-  log (obj, toConsole = true) {
+const Debug = (() => {
+  var log = (obj, toConsole = true) => {
     if (toConsole) {
       console.log(obj);
     } else {
       dbg(obj);
     }
-  }
-};
+  };
+  return {
+    log: log
+  };
+})();
 // function session validation
 const validateSession = (socket, next) => {
   sessionParser(socket.request, {}, () => {
@@ -164,7 +172,7 @@ app.get('/logout', (request, response) => {
 });
 // http server listening
 server.listen(port, () => {
-  Debug.log('Server listening at port %d', port);
+  Debug.log('Server listening at port ' + port);
 });
 // Chatroom
 var numUsers = 0;
