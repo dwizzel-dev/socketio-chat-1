@@ -24,7 +24,8 @@ $(function() {
   var $currentInput = $usernameInput.focus();
 
   //var socket = io(`http://${location.host}`, {
-  var socket = io('/chat', {
+  var socket = io(`http://${location.host}:3000/chat`, {
+  //var socket = io('/chat', {
     path: '/sockets',
     reconnect: true,
     reconnectionAttempts: 3,

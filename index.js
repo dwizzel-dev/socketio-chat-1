@@ -1,5 +1,8 @@
 'use strict';
 
+// On va passer par nginx:80 pour les fichiers static *.css *.js *.html *.php
+// le login et logout via le :3000 et le ws:// aussi
+
 // Setup basic express server
 var dbg = require('debug')('socket-chat-1::index');
 
@@ -14,7 +17,8 @@ var server = http.createServer(app);
 // array des domains qui peuvent acceder
 const arrDomainsAccepted = [
   'http://localhost:3000/',
-  'http://192.168.33.10:3000/'
+  'http://192.168.33.10:3000/',
+  'http://socketio-chat-1.local'
 ];
 // si serverClient a true alors va le chercher dans /node_modules/socket.io-client/dist/
 var io = require('./lib')(server, {
@@ -26,7 +30,7 @@ var io = require('./lib')(server, {
 // origin du domaine
 io.origins((origin, callback) => {
   console.log(origin);
-  if (_.indexOf(arrDomainsAccepted, origin) == -1) {
+  if (_.indexOf(arrDomainsAccepted, origin) === -1) {
     return callback(new Error('origin not allowed'), false);
   }
   callback(null, true);
