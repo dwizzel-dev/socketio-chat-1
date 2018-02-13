@@ -3,8 +3,8 @@
 // On va passer par nginx:80 pour les fichiers static *.css *.js *.html *.php
 // le login et logout via le :3000 et le ws:// aussi
 
-// chandle more connection with redis
-// http://www.ranu.com.ar/2011/11/redisstore-and-rooms-with-socketio.html
+// handle more connection with redis
+// http://www.ranu.com.ar/2011/11/redisstore-and-rooms-with-socketio.htmld
 
 // Setup basic express server
 var dbg = require('debug')('socket-chat-1::index');
@@ -21,7 +21,7 @@ var server = http.createServer(app);
 const arrDomainsAccepted = [
   'http://localhost:3000/',
   'http://192.168.33.10:3000/',
-  'http://socketio-chat-1.local'
+  'http://socketio-chat-1.dwizzel.local'
 ];
 // si serverClient a true alors va le chercher dans /node_modules/socket.io-client/dist/
 var io = require('./lib')(server, {

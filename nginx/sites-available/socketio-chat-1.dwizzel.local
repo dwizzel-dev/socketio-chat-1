@@ -1,7 +1,7 @@
 server {
     listen 80;
     server_name socketio-chat-1.dwizzel.local;
-    root "/usr/share/nginx/public/nodejs/socketio-chat-1/";
+    root "/usr/share/nginx/public/nodejs/socketio-chat-1/public/";
 
     index index.html index.htm index.php;
 
