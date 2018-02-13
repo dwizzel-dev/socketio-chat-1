@@ -3,6 +3,9 @@
 // On va passer par nginx:80 pour les fichiers static *.css *.js *.html *.php
 // le login et logout via le :3000 et le ws:// aussi
 
+// chandle more connection with redis
+// http://www.ranu.com.ar/2011/11/redisstore-and-rooms-with-socketio.html
+
 // Setup basic express server
 var dbg = require('debug')('socket-chat-1::index');
 
